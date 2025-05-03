@@ -1,7 +1,9 @@
 import { Config } from "@markdoc/markdoc";
-import Callout from "../../components/tags/callout";
-import Heading from "../../components/heading";
-import Card from    "../../components/card";
+import Callout from "../components/tags/callout";
+import Heading from "../components/heading";
+import Card from    "../components/card";
+import Superscript from "../components/tags/superscript"
+import Break from "@/components/tags/break";
 
 const config: Config = {
     nodes: {
@@ -11,7 +13,7 @@ const config: Config = {
         heading: {
             render: 'Heading',
             attributes: {
-                level: { type: String }
+                level: { type: Number }
             }
         },
     },
@@ -34,6 +36,19 @@ const config: Config = {
                 },
             }
         },
+        superscript: {
+            render: 'Superscript',
+            attributes: {}
+        },
+        break: {
+            render: 'Break',
+            attributes: {
+                level: {
+                    type: Number,
+                    default: 3
+                },
+            }
+        },
     }
 };
 
@@ -43,7 +58,9 @@ const components = {
     },
     Heading: Heading,
     Callout: Callout,
-    Card: Card
+    Card: Card,
+    Superscript: Superscript,
+    Break: Break,
 };
 
 export { config, components }

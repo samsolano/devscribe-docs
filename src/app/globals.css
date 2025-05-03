@@ -1,3 +1,64 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+:root {
+    /* --background: hsl(0, 0%, 7%); Main */
+    --background: hsl(0, 0%, 7%);
+    --foreground: hsl(0, 0%, 98%); /*Main */
+    /* --foreground: #A0A0A0; */
+  
+  
+  
+  }
+  
+  /* ------------------------ Colors defined in project ------------------------*/
+  /* @theme {
+  
+    --color-devscribe-teal: #FFFFFF;
+    --color-devscribe-dark-gray: #121212;
+    --color-devscribe-card-bg: #0C0C0C;
+    --color-devscribe-hover-bg: #1A1A1A;
+    --color-devscribe-border: #2A2A2A;
+    --color-devscribe-text-primary: #FFFFFF;
+    --color-devscribe-text-secondary: #A0A0A0;
+  
+  } */
+  
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  
+  
+  
+  /* ------------------------ Browser consistency ------------------------*/
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+  
+  
+  
+  
+  /* ------------------------ Component styling ------------------------*/
+  
+  @layer components {
+  
+    .sidebar-section {
+      @apply py-2 border-t border-devscribe-border mt-2;
+    }
+  
+    .sidebar-heading {
+      @apply text-[11px] uppercase tracking-wide text-devscribe-text-secondary font-semibold px-4 py-2;
+    }
+  
+    .sidebar-link {
+      @apply flex items-center gap-3 px-4 py-2 rounded-md text-[13px] text-devscribe-text-secondary hover:text-white hover:bg-devscribe-hover-bg transition-all duration-150 ease-in-out;
+    }
+  }
+  

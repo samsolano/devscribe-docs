@@ -3,12 +3,13 @@ import path from "path";
 import fs from 'fs';
 import Markdoc from '@markdoc/markdoc';
 import React from "react";
-import TableOfContents from "../../components/table.of.contents";
+import TableOfContents from "../../../components/table.of.contents";
 import matter from "gray-matter";
 import { Metadata } from "next";
 import { components, config } from "../config.markdoc";
+import Layout from "@/components/layout/Layout";
 
-const ARTICLES_PATH = "src/app/docs/(pages)";
+const ARTICLES_PATH = "src/app/old/(pages)";
 const POSTS_DIR = path.join(process.cwd(), ARTICLES_PATH);
 
 type Params = {
@@ -73,7 +74,9 @@ export default async function BlogPost({ params }: PageProps) {
     return (
         <>
             {/* <TableOfContents tableOfContents={tableOfContents} /> */}
-            {Markdoc.renderers.react(content, React, { components })}
+            <Layout>
+                {Markdoc.renderers.react(content, React, { components })}
+            </Layout>
         </>
     )
 }
