@@ -13,7 +13,8 @@ import { apiList } from '../../lib/sidebarAPIs';
     MessageCircle,
     BookOpen,
     HelpCircle,
-    Search
+    Search,
+    User,
   } from 'lucide-react';
   import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../components/ui/collapsible';
 
@@ -102,11 +103,15 @@ import { apiList } from '../../lib/sidebarAPIs';
       pathname.split('/api-docs/')[1] : '';
   
     return (
-      <aside className="w-64 h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden border-r border-devscribe-border
-       fixed top-16 left-0 bg-codium-dark-gray scrollbar-thin scrollbar-track-devscribe-dark-gray 
+      <aside className="w-64 h-[calc(100vh-4rem)] overflow-y-auto overflow-x-hidden 
+       fixed left-0 scrollbar-thin scrollbar-track-devscribe-dark-gray
        scrollbar-thumb-devscribe-hover-bg/80 hover:scrollbar-thumb-devscribe-hover-bg/90"
       >
         <div className="flex flex-col h-full">
+
+
+
+        {/* This is where the api marketplace and deepsearch buttons are */}
           {/* <div className="px-6 py-2">
             <nav className="space-y-1">
               <Link 
@@ -141,55 +146,72 @@ import { apiList } from '../../lib/sidebarAPIs';
               </Link>
             </nav>
           </div> */}
+
+          <div className="px-6 py-2">
+              <div 
+                className={`
+                  sidebar-link text-white font-bold
+                  flex items-center gap-4 
+                  px-4 py-2 
+                  transition-all duration-200 `}
+                >
+                <User size={18} />
+                <span>Devscribe</span>
+              </div>
+          </div>
+
+
+
   
           {/* Resources Section */}
           <div className="sidebar-section">
-            <div className="sidebar-heading text-white mb-2 px-6 font-bold">
-              <span>Resources</span>
+            <div className="sidebar-heading text-white mb-2 pr-6 font-bold">
+              {/* <span>Home</span> */}
             </div>
             
             <div className="mt-1 space-y-1">
               <Link 
-                href="/community" 
+                href="/" 
                 className={`
                   sidebar-link font-bold
                   flex items-center gap-4 
-                  px-10 py-2 rounded-md 
+                  pl-8 py-2 rounded-md 
                   transition-all duration-200 
-                  hover:bg-codium-hover-bg 
-                  text-codium-text-secondary
+                  ${pathname === '/' ? 'text-white' : 'text-devscribe-text-secondary'}
                 `}
               >
                 <MessageCircle size={18} />
-                <span>Community</span>
+                <span>Home</span>
               </Link>
               <Link 
-                href="/blog" 
+                href="/edit" 
                 className={`
                   sidebar-link font-bold
                   flex items-center gap-4 
-                  px-10 py-2 rounded-md 
+                  pl-8 py-2 rounded-md 
                   transition-all duration-200 
-                  hover:bg-codium-hover-bg 
-                  text-codium-text-secondary
+                  hover:devscribe-hover-bg
+                  text-devscribe-text-secondary
+                  ${pathname === '/edit' ? ' text-white' : 'text-devscribe-text-secondary'}
                 `}
               >
                 <BookOpen size={18} />
-                <span>Devscribe Blog</span>
+                <span>Editor</span>
               </Link>
               <Link 
-                href="/support" 
+                href="/documentation" 
                 className={`
                   sidebar-link font-bold
                   flex items-center gap-4 
-                  px-10 py-2 rounded-md 
+                  pl-8 py-2 rounded-md 
                   transition-all duration-200 
                   hover:bg-codium-hover-bg 
                   text-codium-text-secondary
+                  ${pathname === '/documentation' ? 'text-white' : 'text-devscribe-text-secondary'}
                 `}
               >
                 <HelpCircle size={18} />
-                <span>Support</span>
+                <span>Documentation</span>
               </Link>
             </div>
           </div>
@@ -271,8 +293,12 @@ import { apiList } from '../../lib/sidebarAPIs';
               ))}
             </div>
           </div> */}
+
+
+
+
           {/* API Categories Section */}
-          <div className="sidebar-section mt-4">
+          {/* <div className="sidebar-section mt-4">
             <div className="sidebar-heading text-white mb-2 px-6 font-bold">
               <span>API Categories</span>
             </div>
@@ -330,8 +356,10 @@ import { apiList } from '../../lib/sidebarAPIs';
                   </Collapsible>
                 );
               })}
-            </div>
-          </div>
+            </div> 
+            </div>*/}
+
+          
         </div>
       </aside>
     );

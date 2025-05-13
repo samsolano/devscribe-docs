@@ -34,7 +34,8 @@ const config: Config = {
                     type: String,
                     default: "default description"
                 },
-            }
+            },
+            children: ['paragraph', 'heading', 'tag', 'fence', 'list', 'item']
         },
         superscript: {
             render: 'Superscript',

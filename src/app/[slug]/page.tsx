@@ -1,8 +1,9 @@
+
 import { glob } from "glob";
 import path from "path";
 import fs from 'fs';
 import Markdoc from '@markdoc/markdoc';
-import React from "react";
+import React, { useState } from "react";
 import TableOfContents from "../../components/table.of.contents";
 import matter from "gray-matter";
 import { Metadata } from "next";
@@ -22,19 +23,19 @@ type PageProps = {
 
 export const dynamicParams = false;
 
-export async function generateStaticParams() {
-    const postPaths = await glob(path.join(POSTS_DIR, '**/*.md'));
-    return postPaths.map(postPath => {
-        return { slug: path.basename(postPath, path.extname(postPath)) }
-    });
-}
+// export async function generateStaticParams() {
+//     const postPaths = await glob(path.join(POSTS_DIR, '**/*.md'));
+//     return postPaths.map(postPath => {
+//         return { slug: path.basename(postPath, path.extname(postPath)) }
+//     });
+// }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-    const { title } = await getMarkdownContent(params.slug);
-    return { title: title }
-}
+// export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+//     const { title } = await getMarkdownContent(params.slug);
+//     return { title: title }
+// }
 
-async function getMarkdownContent(slug: string | undefined) {
+export async function getMarkdownContent(slug: string | undefined) {
     const filePath = path.join(POSTS_DIR, slug + '.md');
     const source = fs.readFileSync(filePath, 'utf-8');
     const matterResult = matter(source);
@@ -67,18 +68,16 @@ function extractHeadings(node: any, sections: any[] = []) {
     return sections;
 }
 
+
 export default async function BlogPost({ params }: PageProps) {
     const { content } = await getMarkdownContent(params.slug);
     const tableOfContents = extractHeadings(content);
 
     return (
         <>
-            {/* <TableOfContents tableOfContents={tableOfContents} /> */}
-            <Layout>
-                <div className="p-16 text-devscribe-text-secondary">
-                    {Markdoc.renderers.react(content, React, { components })}
-                </div>
-            </Layout>
+            
+            {Markdoc.renderers.react(content, React, { components })}
+
         </>
     )
 }

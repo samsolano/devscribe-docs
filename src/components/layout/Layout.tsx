@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const pathname = usePathname();
   
   // Determine which pages should show a sidebar and which ones dont
-  const showSidebar = pathname !== '/download';
+  const showSidebar = pathname !== '/edit';
   const isApiRelatedPage = pathname === '/api-marketplace' || 
     pathname === '/api-deepsearch' || 
     pathname.startsWith('/api-docs/');
@@ -25,10 +25,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div>
-      <Navbar />
-      <div className="flex pt-16">
+      {/* <Navbar /> */}
+      {/* {!showSidebar && <Navbar />} */}
+      <div className="flex">
         {showSidebar && <SidebarComponent />}
-        <main className={`${showSidebar ? 'ml-64' : ''} flex-1 min-h-[calc(100vh-4rem)]`}>
+        <main className={`${showSidebar ? 'ml-64' : 'w-full'} flex-1 min-h-[calc(100vh-4rem) transition-all duration-200 `}>
           {children}
         </main>
       </div>
