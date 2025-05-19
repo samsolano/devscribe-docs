@@ -7,50 +7,6 @@ import Filetree from '@/components/layout/Filetree';
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link';
 
-const firstpost = ` ---
-title: First Post
----
-
-# This is the first title
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-
-
-
-{% break/ %}
-
-
-## This will be indented in the table of contents
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-{% callout %}
-With no title provided it takes the default title provided in the config.
-{% /callout %}
-
-
-{% break/ %}
-
-
-
-{% callout title="test" %}
-Provide a title in the tag and it's used in the component
-{% /callout %}
-
-whats going
-{% superscript %}
-hello
-{% /superscript %}
-on
-
-# hello sir
-
-{% card description="howdy yall" %}
-was gucci
-{% /card %}
-
-asdfasd
-
-hello sirs`
 
 type PageProps = {
   slug: string
@@ -58,9 +14,21 @@ type PageProps = {
 
 
 export default function Home({ slug }: PageProps) {
-  const [text, setText] = useState(firstpost);
+  const [text, setText] = useState("");
   const [parsedContent, setParsedContent] = useState<React.ReactNode | null>(null);
   const [edit, setEdit] = useState(false)
+
+  // Add this function to handle file clicks
+  const handleFileClick = async (contentUrl: string) => {
+    try {
+      const response = await fetch(contentUrl);
+      if (!response.ok) throw new Error('Failed to fetch file content');
+      const content = await response.text();
+      setText(content);
+    } catch (error) {
+      console.error('Error fetching file content:', error);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -79,40 +47,50 @@ export default function Home({ slug }: PageProps) {
 
   return (
     <div className="flex w-full h-screen">
-
-      <div className='flex-none w-1/6 p-2'>
-
+      <div className='flex-none w-1/6 p-2 text-sm'>
         <Link
           href="/"
-          className="sidebar-link font-bold flex items-center gap-4 px-4 py-2 rounded-md transition-all duration-200 text-devscribe-text-secondary hover:text-white mb-4"
+          className="sidebar-link font-bold flex items-center gap-4 px-4 py-2 rounded-md transition-all duration-200 text-devscribe-text-secondary hover:text-white mb-4 text-sm"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={16} />
           <span>Back</span>
         </Link>
 
-        <Filetree />
+        <Filetree onFileClick={handleFileClick} />
       </div>
-
 
       <div className="flex-1 border border-devscribe-border p-4">
         <textarea
-          className="w-full h-full bg-gray-900 text-gray-100 p-4 rounded resize-none focus:outline-none"
+          readOnly={!edit}
+          className="w-full h-full bg-gray-900 text-gray-100 p-4 rounded resize-none focus:outline-none text-sm"
           value={text}
           onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setText(e.target.value)}
         />
       </div>
 
-    
       <div className="flex-1 border border-devscribe-border p-4 overflow-auto">
         <div className='flex flex-col'>
-            <div className='border-b border-devscribe-border flex justify-end'>
-                <button className="px-4 py-2 mb-2 rounded-md bg-amber-700 text-amber-400 hover:text-white transition-colors duration-200">
-                    Edit
-                </button>
-            </div>
-            <div className="prose prose-invert max-w-none">
+          <div className='border-b border-devscribe-border flex justify-end gap-4'>
+            <button
+              className="px-4 py-2 mb-2 rounded-md bg-amber-700 text-amber-400 hover:text-white transition-colors duration-200 text-sm"
+              onClick={() => {
+                setEdit(!edit);
+              }}
+              >
+              Edit
+            </button>
+            <button
+              className="px-4 py-2 mb-2 rounded-md bg-lime-700 text-lime-400 hover:text-white transition-colors duration-200 text-sm"
+              onClick={() => {
+                setEdit(!edit);
+              }}
+              >
+              Save
+            </button>
+          </div>
+          <div className="prose prose-invert max-w-none prose-sm">
             {parsedContent}
-            </div>
+          </div>
         </div>
       </div>
     </div>
