@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { ChevronDown, ChevronRight, Folder, File } from 'lucide-react'
+import { ChevronDown, ChevronRight, FolderIcon, FolderOpenIcon, FileText } from 'lucide-react'
 
 // Define the types for our file tree structure
 type FileNode = {
@@ -88,35 +88,39 @@ async function fetchRepoContents(owner: string, repo: string, path: string = '')
 // Modify the TreeNode component to accept onFileClick
 const TreeNode = ({ node, level = 0, onFileClick }: { node: FileNode | FolderNode, level?: number, onFileClick?: (content: string) => void }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const paddingLeft = `${level * 1.5}rem`
+  const paddingLeft = `${level * 1.25}rem`
 
   if (node.type === 'file') {
     return (
-      <div 
-        className="flex items-center py-1 px-2 hover:bg-gray-700 rounded cursor-pointer" 
+      <div
+        className="flex items-center py-1 px-2 hover:bg-accent rounded cursor-pointer transition-colors"
         style={{ paddingLeft }}
         onClick={() => node.content && onFileClick?.(node.content)}
       >
-        <File size={16} className="text-blue-400 mr-2" />
-        <span className="text-gray-300">{node.name}</span>
+        <FileText className="size-4 text-white mr-2" />
+        <span className="text-foreground text-sm">{node.name}</span>
       </div>
     )
   }
 
   return (
     <div>
-      <div 
-        className="flex items-center py-1 px-2 hover:bg-gray-700 rounded cursor-pointer" 
+      <div
+        className="flex items-center py-1 px-2 hover:bg-accent rounded cursor-pointer transition-colors"
         style={{ paddingLeft }}
         onClick={() => setIsOpen(!isOpen)}
       >
         {isOpen ? (
-          <ChevronDown size={16} className="text-gray-400 mr-2" />
+          <ChevronDown className="size-4 text-white mr-1" />
         ) : (
-          <ChevronRight size={16} className="text-gray-400 mr-2" />
+          <ChevronRight className="size-4 text-white mr-1" />
         )}
-        <Folder size={16} className="text-yellow-400 mr-2" />
-        <span className="text-gray-300">{node.name}</span>
+        {isOpen ? (
+          <FolderOpenIcon className="size-4 text-white mr-2" />
+        ) : (
+          <FolderIcon className="size-4 text-white mr-2" />
+        )}
+        <span className="text-foreground text-sm">{node.name}</span>
       </div>
       {isOpen && (
         <div>
@@ -134,6 +138,9 @@ export default function Filetree({ onFileClick }: FiletreeProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [fileTree, setFileTree] = useState<FileTree>([]);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [newFolderName, setNewFolderName] = useState("");
+  const [isAddingFolder, setIsAddingFolder] = useState(false);
 
   useEffect(() => {
     const loadRepoStructure = async () => {
@@ -142,7 +149,6 @@ export default function Filetree({ onFileClick }: FiletreeProps) {
         // Replace these with your repository details
         const owner = 'samsolano';
         const repo = 'API_Testing';
-        
         const tree = await fetchRepoContents(owner, repo);
         setFileTree(tree);
       } catch (err) {
@@ -152,37 +158,103 @@ export default function Filetree({ onFileClick }: FiletreeProps) {
         setIsLoading(false);
       }
     };
-
     loadRepoStructure();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="bg-gray-800 rounded-lg p-4">
-        <div className="text-gray-400 text-center py-4">
-          Loading repository structure...
-        </div>
-      </div>
-    );
+  // Filter file tree by search query
+  function filterTree(tree: FileTree, query: string): FileTree {
+    if (!query) return tree;
+    return tree
+      .map((node) => {
+        if (node.type === 'folder') {
+          const filteredChildren = filterTree(node.children, query);
+          if (filteredChildren.length > 0 || node.name.toLowerCase().includes(query.toLowerCase())) {
+            return { ...node, children: filteredChildren };
+          }
+          return null;
+        } else {
+          return node.name.toLowerCase().includes(query.toLowerCase()) ? node : null;
+        }
+      })
+      .filter(Boolean) as FileTree;
   }
 
-  if (error) {
-    return (
-      <div className="bg-gray-800 rounded-lg p-4">
-        <div className="text-red-400 text-center py-4">
-          {error}
-        </div>
-      </div>
-    );
-  }
+  const filteredTree = filterTree(fileTree, searchQuery);
+
+  // Add folder handler (local only, not on GitHub)
+  const handleAddFolder = () => {
+    if (newFolderName.trim()) {
+      const newFolder: FolderNode = {
+        name: newFolderName,
+        type: 'folder',
+        children: [],
+      };
+      setFileTree([...fileTree, newFolder]);
+      setNewFolderName("");
+      setIsAddingFolder(false);
+    }
+  };
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4">
-      <div className="text-gray-300 font-semibold mb-4">Repository Structure</div>
-      <div className="space-y-1">
-        {fileTree.map((node, index) => (
-          <TreeNode key={index} node={node} onFileClick={onFileClick} />
-        ))}
+    <div className="flex flex-col h-full border-r bg-card rounded-lg shadow-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b p-2">
+        <h2 className="text-sm font-medium text-foreground">Folders</h2>
+        {isAddingFolder ? (
+          <div className="flex items-center gap-1">
+            <input
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              placeholder="Folder name"
+              className="h-7 text-xs w-32 rounded border px-2 bg-background text-foreground"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleAddFolder();
+                if (e.key === "Escape") setIsAddingFolder(false);
+              }}
+              autoFocus
+            />
+            <button className="h-7 w-7 flex items-center justify-center rounded hover:bg-accent" onClick={handleAddFolder}>
+              <svg className="h-3 w-3 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+              <span className="sr-only">Add folder</span>
+            </button>
+            <button className="h-7 w-7 flex items-center justify-center rounded hover:bg-accent" onClick={() => setIsAddingFolder(false)}>
+              <svg className="h-3 w-3 text-red-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+              <span className="sr-only">Cancel</span>
+            </button>
+          </div>
+        ) : (
+          <button className="h-8 w-8 flex items-center justify-center rounded hover:bg-accent" onClick={() => setIsAddingFolder(true)}>
+            <svg className="h-4 w-4 text-foreground" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+            <span className="sr-only">New folder</span>
+          </button>
+        )}
+      </div>
+      {/* Search */}
+      <div className="p-2 border-b">
+        <input
+          placeholder="Search files..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="h-8 text-sm w-full rounded border px-2 bg-background text-foreground"
+        />
+      </div>
+      {/* Tree */}
+      <div className="flex-1 overflow-auto p-2">
+        {isLoading ? (
+          <div className="text-muted-foreground text-center py-4">Loading repository structure...</div>
+        ) : error ? (
+          <div className="text-red-400 text-center py-4">{error}</div>
+        ) : (
+          <div className="space-y-1">
+            {filteredTree.length === 0 ? (
+              <div className="text-muted-foreground text-xs text-center py-4">No files found.</div>
+            ) : (
+              filteredTree.map((node, index) => (
+                <TreeNode key={index} node={node} onFileClick={onFileClick} />
+              ))
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
